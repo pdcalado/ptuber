@@ -9,6 +9,7 @@ my $config = Config::IniFiles->new( -file => "config.ini" );
 my $cmd_mkdir = $config->val("Main", "Make Dir Command");
 my $cmd_rmdir = $config->val($section, "Remove Dir Command");
 my $cmd_thumb = $config->val($section, "Program");
+my $program_log_file = $config->val($section, "Program Log File");
 my $flag_i = $config->val($section, "Input File Flag");
 my $flag_o = $config->val($section, "Output File Flag");
 my $flag_perc = $config->val($section, "Percentage Flag");
@@ -16,6 +17,7 @@ my $flag_format = $config->val($section, "Format Flag");
 my $output_format = $config->val($section, "Output File Format");
 my $number_pixels = $config->val($section, "Number of Pixels");
 my $perc_shots = $config->val($section, "Percentage Shots");
+my $failed_log_file = $config->val($section, "Failed Video Log File");
 # name of the file that will hold the video's path
 my $path_file_name = $config->val($section, "Path File Name");
 
@@ -74,7 +76,8 @@ sub create_thumbs{
 	my $perc = $flag_perc . " " . $shot;
 	my $output = $flag_o . " " . $target_path . "/" . $shot . "." . $output_format;
 	my $prog_str = $prog_str . $output . " " . $perc;
-	if (system($prog_str . " &> /dev/null") != 0) {
+
+	if (system($prog_str . " &>> " . $program_log_file) != 0) {
 	    return 0;
 	}
     }
@@ -82,15 +85,27 @@ sub create_thumbs{
     return 1;
 }
 
+# clear program log file
+run_cmd("rm -f " . $program_log_file);
+
+# create list for failed videos
+my @failed_list;
+
+# get hash and path pair from standard input
 my @userinput = <STDIN>;
 foreach my $line (@userinput) {
     chomp($line);
     my($hash, $path) = split("\t", $line);
 
+    # check if the dir exists
     if (check_dir($hash) == 0) {
+	# create file with path of the video
 	print_to_file(($hash, $path));
+
+	# create thumbs for video
 	if (create_thumbs(($hash, $path)) == 0) {
 	    print "Failed to produce for " . $path . "\n";
+	    push(@failed_list, $path);
 	    rm_dir($hash);
 	}
 	else {
@@ -99,3 +114,9 @@ foreach my $line (@userinput) {
     }
 }
 
+# clear list of failed videos
+run_cmd("rm -f " . $failed_log_file);
+
+foreach my $vid (@failed_list) {
+    run_cmd("echo \"" . $vid . "\" >> " . $failed_log_file);
+}
