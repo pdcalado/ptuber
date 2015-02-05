@@ -12,7 +12,7 @@ foreach my $line (@userinput) {
     my $title = "";
 
     if ($dot <= $slash || $dot < 0 || $slash < 0 || $dot - $slash - 1 <= 0) {
-	$title = "Bad Name";
+	$title = "Random_Name";
     }
     else {
 	$title = substr($line, $slash + 1, $dot - $slash - 1);
