@@ -43,6 +43,7 @@ my $cmd_vid_ext = get_config("Check Extension") . " -v";
 my $cmd_photo_ext = get_config("Check Extension") . " -p";
 my $cmd_gen_hash = get_config("Generate Hashes");
 my $cmd_update_thumbs = get_config("Update Thumbs");
+my $thumb_dir = get_config("Thumbnail Directory");
 
 # Log files for videos and hashes
 my $logfile_vid = get_config("Video Log File");
@@ -64,7 +65,6 @@ my $cmd_cat_vid = "cat " . $logfile_vid;
 run_cmd($cmd_cat_vid . " | " . $perl_generate_hash . " > " . $logfile_vid_hash);
 
 # Check for thumbs folder
-my $thumb_dir = get_config("Thumbnail Directory");
 if (check_dir($thumb_dir) == 0) {
     print STDERR "Created " . $thumb_dir . " folder.\n";
 }
