@@ -3,9 +3,6 @@ use strict;
 use warnings;
 use Config::IniFiles;
 
-# use Config::IniFiles;
-# my $config = Config::IniFiles->new( -file => "config.ini" );
-
 sub run_cmd{
     system(@_) == 0
 	or die "system @_ failed: $?"
@@ -14,7 +11,6 @@ sub run_cmd{
 sub write_column{
     my @list = @_;
     my $cmd_full = "cat " . $list[0] . " | " . $list[1] . " > " . $list[2];
-    print $cmd_full . "\n";
     run_cmd($cmd_full);
 }
 
@@ -32,12 +28,14 @@ my $cmd_perl = $config->val("Main", "Perl Command");
 my $cmd_bash = $config->val("Main", "Bash Command");
 my $cmd_bash_exec = $config->val("Main", "Bash Executor");
 my $cmd_rm = $config->val("Main", "Remove File Command");
+my $log_dir = $config->val("Main", "Log Directory");
+my $log_prefix = $config->val("Create Table", "Log Prefix");
 
 # log file names
-my $titles = "titles.log";
-my $duration = "durations.log";
-my $thumbs = "thumbs.log";
-my $resolution = "resolutions.log";
+my $titles = $log_dir . $log_prefix . "titles.log";
+my $duration = $log_dir . $log_prefix . "durations.log";
+my $thumbs = $log_dir . $log_prefix . "thumbs.log";
+my $resolution = $log_dir . $log_prefix . "resolutions.log";
 
 # Command to execute bash command as argument
 my $bash_exec = $cmd_perl . " " . $cmd_bash_exec;
@@ -54,7 +52,8 @@ write_column($ARGV[0], $resolution_cmd, $resolution);
 write_column($ARGV[1], $cmd_perl . " " . $script_thumb_path, $thumbs);
 
 # Print first line with column names
-print "hash filename title duration resolution thumbs\n";
+print "hash\t" . "filename\t" . "title\t" . "duration\t" . "resolution\t" . "thumbs\n";
+
 
 # Paste command to join columns
 my $cmd_paste = "paste";

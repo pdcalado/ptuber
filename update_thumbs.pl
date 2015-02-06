@@ -9,7 +9,8 @@ my $config = Config::IniFiles->new( -file => "config.ini" );
 my $cmd_mkdir = $config->val("Main", "Make Dir Command");
 my $cmd_rmdir = $config->val("Main", "Remove Dir Command");
 my $cmd_thumb = $config->val($section, "Program");
-my $program_log_file = $config->val($section, "Program Log File");
+my $log_dir = $config->val("Main", "Log Directory");
+my $program_log_file = $log_dir . $config->val($section, "Program Log File");
 my $flag_i = $config->val($section, "Input File Flag");
 my $flag_o = $config->val($section, "Output File Flag");
 my $flag_perc = $config->val($section, "Percentage Flag");
@@ -17,7 +18,7 @@ my $flag_format = $config->val($section, "Format Flag");
 my $output_format = $config->val($section, "Output File Format");
 my $number_pixels = $config->val($section, "Number of Pixels");
 my $perc_shots = $config->val($section, "Percentage Shots");
-my $failed_log_file = $config->val($section, "Failed Video Log File");
+my $failed_log_file = $log_dir . $config->val($section, "Failed Video Log File");
 # name of the file that will hold the video's path
 my $path_file_name = $config->val($section, "Path File Name");
 
