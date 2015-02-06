@@ -4,7 +4,7 @@ use warnings;
 
 use Config::IniFiles;
 
-my $config = Config::IniFiles->new( -file => "/home/calado/temp/perl_test/config.ini" );
+my $config = Config::IniFiles->new( -file => "config.ini" );
 
 my @video_ext = split(',', $config->val("Extensions", "Video"));
 my @photo_ext = split(',', $config->val("Extensions", "Photo"));
