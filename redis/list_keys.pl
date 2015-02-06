@@ -11,8 +11,6 @@ my $config = Config::IniFiles->new( -file => "config.ini" );
 # Database endpoint
 my $db_hostname = $config->val("DB", "Database Hostname");
 my $db_port = $config->val("DB", "Database Port");
-# Videos database prefix
-my $vid_prefix = $config->val("DB", "Videos Prefix");
 
 # Connect to database
 my $red = Redis::Client->new( host => $db_hostname,
