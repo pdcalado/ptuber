@@ -24,21 +24,47 @@ if ($#ARGV + 1 != 2) {
 }
 
 my $config = Config::IniFiles->new( -file => "config.ini" );
-my $script_titles = $config->val("Main", "Create Title");
-my $script_durations = $config->val("Main", "Create Durations");
-my $script_resolutions = $config->val("Main", "Create Resolutions");
+my $script_titles = $config->val("Create Table", "Create Title");
+my $script_durations = $config->val("Create Table", "Create Durations");
+my $script_resolutions = $config->val("Create Table", "Create Resolutions");
+my $script_thumb_path = $config->val("Create Table", "Create Thumb Path");
 my $cmd_perl = $config->val("Main", "Perl Command");
 my $cmd_bash = $config->val("Main", "Bash Command");
+my $cmd_bash_exec = $config->val("Main", "Bash Executor");
+my $cmd_rm = $config->val("Main", "Remove File Command");
 
-my $cmd_rm = "rm -f";
+# log file names
 my $titles = "titles.log";
 my $duration = "durations.log";
 my $thumbs = "thumbs.log";
 my $resolution = "resolutions.log";
 
-my $bashrun = $cmd_perl . " bash_run.pl \"" . $cmd_bash . " " . $script_durations . "\"";
+# Command to execute bash command as argument
+my $bash_exec = $cmd_perl . " " . $cmd_bash_exec;
 
-# write_column($ARGV[0], $cmd_perl . " " . $script_titles, $titles);
-write_column($ARGV[0], $bashrun, $duration);
-# write_column($ARGV[0], $cmd_bash . " " . $script_resolutions, $resolution);
-#write_column($ARGV[0], $cmd_bash . " " . $script_thumbs, $thumbs);
+# Duration compute command
+my $duration_cmd = $bash_exec . " \"" . $cmd_bash . " " . $script_durations . "\"";
+# Resolution compute command
+my $resolution_cmd = $bash_exec . " \"" . $cmd_bash . " " . $script_resolutions . "\"";
+
+# Write columns to files
+write_column($ARGV[0], $cmd_perl . " " . $script_titles, $titles);
+write_column($ARGV[0], $duration_cmd, $duration);
+write_column($ARGV[0], $resolution_cmd, $resolution);
+write_column($ARGV[1], $cmd_perl . " " . $script_thumb_path, $thumbs);
+
+# Print first line with column names
+print "hash filename title duration resolution thumbs\n";
+
+# Paste command to join columns
+my $cmd_paste = "paste";
+
+my $cmd_table = $cmd_paste . " " 
+    . $ARGV[1] . " "
+    . $ARGV[0] . " "
+    . $titles . " "
+    . $duration . " "
+    . $resolution . " "
+    . $thumbs;
+
+run_cmd($cmd_table);
