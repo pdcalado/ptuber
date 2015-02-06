@@ -10,8 +10,6 @@ foreach my $line (@userinput) {
 
     my $cmd = $ARGV[0] . " " . $line;
 
-    print $cmd . "\n";
-
     my($chld_out, $chld_in);
     my $pid = open2($chld_out, $chld_in, $cmd);
 
@@ -25,7 +23,7 @@ foreach my $line (@userinput) {
 	$output = $output . $item;
     }
 
-    if (length($output) == 0 || $output =~ /^ *$/) {
+    if (length($output) <= 1 || $output =~ /^ *$/) {
 	$output = "-1";
     }
 
