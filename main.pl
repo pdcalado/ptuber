@@ -36,6 +36,7 @@ sub check_dir{
 
 if ($#ARGV + 1 == 0) {
     print "must provide path\n";
+    exit;
 }
 
 # Atomic commands
