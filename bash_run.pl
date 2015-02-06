@@ -8,8 +8,12 @@ my @userinput = <STDIN>;
 foreach my $line (@userinput) {
     chomp($line);
 
+    my $cmd = $ARGV[0] . " " . $line;
+
+    print $cmd . "\n";
+
     my($chld_out, $chld_in);
-    my $pid = open2($chld_out, $chld_in, $line);
+    my $pid = open2($chld_out, $chld_in, $cmd);
 
     waitpid($pid, 0);
 
