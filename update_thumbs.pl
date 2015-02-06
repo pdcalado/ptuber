@@ -7,7 +7,7 @@ use Config::IniFiles;
 my $section = "Thumbnails";
 my $config = Config::IniFiles->new( -file => "config.ini" );
 my $cmd_mkdir = $config->val("Main", "Make Dir Command");
-my $cmd_rmdir = $config->val($section, "Remove Dir Command");
+my $cmd_rmdir = $config->val("Main", "Remove Dir Command");
 my $cmd_thumb = $config->val($section, "Program");
 my $program_log_file = $config->val($section, "Program Log File");
 my $flag_i = $config->val($section, "Input File Flag");
