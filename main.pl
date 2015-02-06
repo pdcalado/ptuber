@@ -6,6 +6,7 @@ use Config::IniFiles;
 my $config = Config::IniFiles->new( -file => "config.ini" );
 my $cmd_mkdir = get_config("Make Dir Command");
 my $cmd_perl = get_config("Perl Command");
+my $log_dir = get_config("Log Directory");
 
 sub get_config{
     return $config->val("Main", @_);
@@ -44,11 +45,13 @@ my $cmd_photo_ext = get_config("Check Extension") . " -p";
 my $cmd_gen_hash = get_config("Generate Hashes");
 my $cmd_update_thumbs = get_config("Update Thumbs");
 my $thumb_dir = get_config("Thumbnail Directory");
-my $log_dir = get_config("Log Directory");
 
 # Log files for videos and hashes
 my $logfile_vid = $log_dir . get_config("Video Log File");
 my $logfile_vid_hash = $log_dir . get_config("Video Hash Log File");
+
+# Create log directory
+check_dir($log_dir);
 
 # Cycle through directory
 my $perl_cycle = perl_suffix($cmd_cycle . " " . $ARGV[0]);
