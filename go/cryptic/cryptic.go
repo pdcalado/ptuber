@@ -10,10 +10,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 const (
-	globalAlgo = "aes-256-cbc"
+	globalAlgo    = "aes-256-cbc"
+	globalSeqSize = 20
 )
 
 func cmdEncrypt(input string, output string, pass string) *exec.Cmd {
@@ -98,6 +100,16 @@ func main() {
 
 	fmt.Printf("Handling %d files\n", len(fileList))
 
+	var list map[string]entry
+	if _, err := os.Stat(keyfile); err == nil {
+		list, err = readKey(keyfile)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		list = make(map[string]entry)
+	}
+
 	// Check existing files
 	for file, _ := range fileList {
 		hash := ToHash(file)
@@ -106,16 +118,45 @@ func main() {
 		if err == nil {
 			fileList[file] = false
 			fmt.Println("Skipping", file)
+			continue
+		}
+
+		_, ok := list[hash]
+		if ok {
+			fileList[file] = false
+			fmt.Println("Skipping", file)
+			continue
 		}
 	}
 
-	list, err := readKey(keyfile)
-	if err != nil {
-		panic(err)
+	// start converting files
+	for file, _ := range fileList {
+		e := entry{
+			Path: file,
+			Hash: ToHash(file),
+			Key:  randSeq(globalSeqSize),
+		}
+
+		fmt.Println("Encrypting", file)
+		err := encryptFile(file, output+e.Hash, e.Key)
+		if err != nil {
+			fmt.Println("encryption failed:", err)
+			continue
+		}
+
+		list[e.Hash] = e
 	}
 
-	err = writeKey(list, "stupid_key.json")
-	if err != nil {
-		panic(err)
-	}
+	defer func() {
+		t := time.Now().UTC().Unix()
+		name := fmt.Sprintf("key_%v.json", t)
+		err := writeKey(list, name)
+		if err == nil {
+			fmt.Println("Wrote", name)
+			return
+		}
+
+		panic("failed to write json file")
+	}()
+
 }
