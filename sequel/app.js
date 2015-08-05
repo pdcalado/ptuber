@@ -10,9 +10,7 @@ var PORT = 3000;
 //so the program will not close instantly
 process.stdin.resume();
 
-console.log(typeof records.Records);
-
-var recs = new records.Records("mytempdb");
+var recs = new records.Records("storedb");
 
 var closed = 0;
 
@@ -41,7 +39,7 @@ function handleRequest(request, response){
     try {
         //log the request on console
         console.log(request.url);
-        //Disptach
+        //Dispatch
         dispatcher.dispatch(request, response);
     } catch(err) {
         console.log(err);
@@ -50,8 +48,6 @@ function handleRequest(request, response){
 
 dispatcher.onGet("/encrypted", function(req, res) {
     var queryData = url.parse(req.url, true).query;
-
-    console.log("here with " + queryData.name + " " + queryData.id);
 
     if (queryData.name === undefined && queryData.id === undefined) {
 	res.statusCode = 404;
@@ -86,9 +82,25 @@ dispatcher.onGet("/encrypted", function(req, res) {
 
 
 //A sample POST request
-dispatcher.onPost("/post1", function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('Got Post Data');
+dispatcher.onPost("/encrypted", function(request, response) {
+    console.log("right here");
+
+    console.log("method " + request.method + " headers " + JSON.stringify(request.headers));
+    console.log("url " + request.url);
+
+    request.on('data', function(chunk) {
+	console.log("Received body data:");
+	console.log(chunk.toString());
+    });
+
+    request.on('end', function() {
+	response.writeHead(200, {'Content-Type': 'text/plain'});
+	response.end('Got Post Data');
+    });
+
+    request.on('error', function(e) {
+	console.log("some error " + e);
+    });
 });
 
 //Create the server
@@ -98,4 +110,26 @@ var server = http.createServer(handleRequest);
 server.listen(PORT, function(){
     //Callback triggered when server is successfully listening. Hurray!
     console.log("Server listening on: http://localhost:%s", PORT);
+});
+
+var server2 = http.createServer(function (request, response) {
+    if (request.method == 'POST') {
+        var body = '';
+        request.on('data', function (data) {
+            body += data;
+
+            // Too much POST data, kill the connection!
+            if (body.length > 1e6)
+                request.connection.destroy();
+        });
+        request.on('end', function () {
+	    console.log(body);
+	    response.end();
+            // use post['blah'], etc.
+        });
+    }
+});
+
+server2.listen(PORT+1, function () {
+    console.log("also listening at " + PORT + 1);
 });

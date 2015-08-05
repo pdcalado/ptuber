@@ -49,6 +49,30 @@ Records.prototype.getEncrypted = function (field, value, callback) {
     });
 };
 
+Records.prototype.setEncrypted = function (row, callback) {
+    var sqlerr = null;
+
+    var values = "'" + row.id + "', '" + row.name + "', '" + row.password + "'";
+    if (row.path !== undefined) {
+	values += ", '" + row.path + "'";
+    }
+
+    var q = "INSERT INTO encrypted VALUES (" + values + ")";
+
+    console.log(q);
+
+    this.db.run(q, [], function (err) {
+	if (err !== null) {
+	    callback(err);
+	    console("Insertion error: " + err)
+	    return;
+	}
+
+	callback(null);
+    });
+};
+
 exports.Records = Records;
 exports.Records.getEncrypted = Records.getEncrypted;
 exports.Records.close = Records.close;
+exports.Records.setEncrypted = Records.setEncrypted;
