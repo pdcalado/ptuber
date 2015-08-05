@@ -39,29 +39,36 @@ function handleRequest(request, response){
 
 var db = new sqlite3.Database("mytempdb");
 
-//A sample GET request
-dispatcher.onGet("/page1", function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('Page One');
-});
-
 dispatcher.onGet("/sql", function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/json'});
-
-    var lines = [];
+    var entries = [];
+    var sqlerr = null;
 
     function perRow(err, row) {
-	var line = {};
-	line.id = row.id;
-	line.value = row.one;
-	lines.push(line);
+	if (err !== null) {
+	    sqlerr = err;
+	    console.log(err);
+	    return;
+	}
+
+	var entry = {};
+	entry.id = row.id;
+	entry.value = row.one;
+	entries.push(entry);
     }
 
     db.serialize(function() {
 	db.each("SELECT rowid AS id, one FROM sample",
 		perRow,
-		function () {
-		    res.end(JSON.stringify(lines));
+		function (err) {
+		    if (err !== null || sqlerr !== null) {
+			console.log("Completion error: " + err);
+			res.statusCode = 404;
+			res.end();
+			return;
+		    }
+
+		    res.writeHead(200, {'Content-Type': 'text/json'});
+		    res.end(JSON.stringify(entries));
 		});
     });
 });
@@ -73,7 +80,7 @@ dispatcher.onPost("/post1", function(req, res) {
     res.end('Got Post Data');
 });
 
-//Create a server
+//Create the server
 var server = http.createServer(handleRequest);
 
 //Lets start our server
