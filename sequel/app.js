@@ -1,16 +1,27 @@
 var http = require('http');
-var sqlite3 = require('sqlite3').verbose();
 var dispatcher = require('httpdispatcher');
 var process = require('process');
+var url = require('url');
+
+var records = require('./records.js');
 
 var PORT = 3000;
 
 //so the program will not close instantly
 process.stdin.resume();
 
+console.log(typeof records.Records);
+
+var recs = new records.Records("mytempdb");
+
+var closed = 0;
+
 function exitHandler(options, err) {
-    console.log('leaving');
-    db.close();
+    if (closed === 0) {
+	console.log('leaving');
+	recs.close();
+	closed = 1;
+    }
 
     if (err) console.log(err.stack);
     if (options.exit) process.exit();
@@ -37,40 +48,40 @@ function handleRequest(request, response){
     }
 }
 
-var db = new sqlite3.Database("mytempdb");
+dispatcher.onGet("/encrypted", function(req, res) {
+    var queryData = url.parse(req.url, true).query;
 
-dispatcher.onGet("/sql", function(req, res) {
-    var entries = [];
-    var sqlerr = null;
+    console.log("here with " + queryData.name + " " + queryData.id);
 
-    function perRow(err, row) {
+    if (queryData.name === undefined && queryData.id === undefined) {
+	res.statusCode = 404;
+	res.end("Bad query, no name or id");
+	return;
+    }
+
+    function handleResult(err, obj) {
 	if (err !== null) {
-	    sqlerr = err;
-	    console.log(err);
+	    res.statusCode = 404;
+	    res.end();
 	    return;
 	}
 
-	var entry = {};
-	entry.id = row.id;
-	entry.value = row.one;
-	entries.push(entry);
+	res.writeHead(200, {'Content-Type': 'text/json'});
+	res.end(JSON.stringify(obj));
     }
 
-    db.serialize(function() {
-	db.each("SELECT rowid AS id, one FROM sample",
-		perRow,
-		function (err) {
-		    if (err !== null || sqlerr !== null) {
-			console.log("Completion error: " + err);
-			res.statusCode = 404;
-			res.end();
-			return;
-		    }
+    if (queryData.name === undefined) {
+	recs.getEncrypted("id", queryData.id, handleResult);
+	return;
+    }
 
-		    res.writeHead(200, {'Content-Type': 'text/json'});
-		    res.end(JSON.stringify(entries));
-		});
-    });
+    if (queryData.id === undefined) {
+	recs.getEncrypted("name", queryData.name, handleResult);
+	return;
+    }
+
+    res.statusCode = 404;
+    res.end("Undefined state");
 });
 
 
