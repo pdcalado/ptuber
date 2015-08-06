@@ -10,10 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "http": "0.0.0",
-    "httpdispatcher": "^0.4.0",
     "jshint-stylish": "^2.0.1",
     "process": "^0.11.1",
-    "sqlite3": "^3.0.9"
+    "sqlite3": "^3.0.9",
+    "url": "^0.10.3"
   },
   "devDependencies": {
     "gulp": "^3.9.0",

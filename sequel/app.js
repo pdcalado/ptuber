@@ -1,5 +1,4 @@
 var http = require('http');
-var dispatcher = require('httpdispatcher');
 var process = require('process');
 var url = require('url');
 
@@ -34,19 +33,7 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-//Lets use our dispatcher
-function handleRequest(request, response){
-    try {
-        //log the request on console
-        console.log(request.url);
-        //Dispatch
-        dispatcher.dispatch(request, response);
-    } catch(err) {
-        console.log(err);
-    }
-}
-
-dispatcher.onGet("/encrypted", function(req, res) {
+function onGetEncrypted(req, res) {
     var queryData = url.parse(req.url, true).query;
 
     if (queryData.name === undefined && queryData.id === undefined) {
@@ -78,58 +65,53 @@ dispatcher.onGet("/encrypted", function(req, res) {
 
     res.statusCode = 404;
     res.end("Undefined state");
-});
+}
 
+function onPostEncrypted(req, res) {
+    var data = "";
 
-//A sample POST request
-dispatcher.onPost("/encrypted", function(request, response) {
-    console.log("right here");
-
-    console.log("method " + request.method + " headers " + JSON.stringify(request.headers));
-    console.log("url " + request.url);
-
-    request.on('data', function(chunk) {
-	console.log("Received body data:");
-	console.log(chunk.toString());
+    req.on('data', function(chunk) {
+	data += chunk.toString();
     });
 
-    request.on('end', function() {
-	response.writeHead(200, {'Content-Type': 'text/plain'});
-	response.end('Got Post Data');
+    req.on('end', function() {
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	var obj = JSON.parse(data);
+	recs.setEncrypted(obj, function (err) {
+	    if (err !== null) {
+		res.statusCode = 404;
+		res.end(err);
+		return;
+	    }
+
+	    res.statusCode = 200;
+	    res.end("Success");
+	});
     });
 
-    request.on('error', function(e) {
-	console.log("some error " + e);
+    req.on('error', function(e) {
+	res.statusCode = 404;
+	res.end(e);
+	return;
     });
-});
+}
 
 //Create the server
-var server = http.createServer(handleRequest);
-
-//Lets start our server
-server.listen(PORT, function(){
-    //Callback triggered when server is successfully listening. Hurray!
-    console.log("Server listening on: http://localhost:%s", PORT);
-});
-
-var server2 = http.createServer(function (request, response) {
-    if (request.method == 'POST') {
-        var body = '';
-        request.on('data', function (data) {
-            body += data;
-
-            // Too much POST data, kill the connection!
-            if (body.length > 1e6)
-                request.connection.destroy();
-        });
-        request.on('end', function () {
-	    console.log(body);
-	    response.end();
-            // use post['blah'], etc.
-        });
+var server = http.createServer(function (request, response) {
+    try {
+	if (request.url.indexOf("/encrypted") === 0) {
+	    if (request.method === "GET") {
+		onGetEncrypted(request, response);
+	    } else if (request.method === "POST") {
+		onPostEncrypted(request, response);
+	    }
+	}
+    }
+    catch (err) {
+	console.log("error: " + err);
     }
 });
 
-server2.listen(PORT+1, function () {
-    console.log("also listening at " + PORT + 1);
+server.listen(PORT, function () {
+    console.log("Server listening on: http://localhost:%s", PORT);
 });
