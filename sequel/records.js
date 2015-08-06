@@ -74,8 +74,8 @@ Records.prototype.setEncrypted = function (row, callback) {
 
     this.db.run(q, [], function (err) {
 	if (err !== null) {
+	    console.log("Insertion error: " + err);
 	    callback(err);
-	    console("Insertion error: " + err);
 	    return;
 	}
 
