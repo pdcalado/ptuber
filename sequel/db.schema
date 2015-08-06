@@ -1,0 +1,10 @@
+CREATE TABLE encrypted (
+id char(50) primary key not null,
+name char(100) not null,
+password char(100) not null,
+path char(200));
+
+CREATE TABLE uploaded (
+id char(50) primary key not null,
+path char(200),
+thumbs char(200));
