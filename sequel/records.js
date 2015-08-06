@@ -11,6 +11,7 @@ Records.prototype.close = function () {
 
 var colNames = "id, name, password, path";
 
+// Get rows from encrypted table
 Records.prototype.getEncrypted = function (field, value, callback) {
     var sqlerr = null;
     var obj = {};
@@ -49,12 +50,22 @@ Records.prototype.getEncrypted = function (field, value, callback) {
     });
 };
 
+// Insert a row into encrypted table
 Records.prototype.setEncrypted = function (row, callback) {
     var sqlerr = null;
+
+    if (row.id === undefined ||
+	row.name === undefined ||
+	row.password === undefined) {
+	callback("at least id, name and password must be provided");
+	return;
+    }
 
     var values = "'" + row.id + "', '" + row.name + "', '" + row.password + "'";
     if (row.path !== undefined) {
 	values += ", '" + row.path + "'";
+    } else {
+	values += ", ''";
     }
 
     var q = "INSERT INTO encrypted VALUES (" + values + ")";
