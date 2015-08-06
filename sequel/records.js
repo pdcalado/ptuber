@@ -2,7 +2,7 @@ var sqlite3 = require('sqlite3').verbose();
 
 Records = function Records(dbfile) {
     this.db = new sqlite3.Database(dbfile);
-}
+};
 
 Records.prototype.close = function () {
     console.log("closing db");
@@ -75,7 +75,7 @@ Records.prototype.setEncrypted = function (row, callback) {
     this.db.run(q, [], function (err) {
 	if (err !== null) {
 	    callback(err);
-	    console("Insertion error: " + err)
+	    console("Insertion error: " + err);
 	    return;
 	}
 
