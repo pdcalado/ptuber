@@ -33,7 +33,7 @@ else
 fi
 
 # encrypt file
-bash encrypt.sh $1 $pass $2/$hash_name
+bash encrypt.sh $1 $pass $2/$hash_name.enc
 
 tar -czf $hash_name.temporary.tar.gz thumbs/$hash_name-*
 
