@@ -80,7 +80,7 @@ function onPostEncrypted(req, res) {
 	recs.setEncrypted(obj, function (err) {
 	    if (err !== null) {
 		res.statusCode = 404;
-		res.end(err);
+		res.end("failed post: " + err);
 		return;
 	    }
 
