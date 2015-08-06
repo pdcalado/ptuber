@@ -11,9 +11,12 @@ hash_name=$(echo -n "$1" | md5sum - | cut -d' ' -f1)
 pass=$(bash gen_passwd.sh)
 
 # Check if encrypted file already exists
-nulled=$(stat $2/$hash_name >> /dev/null 2>&1)
+nulled=$(stat $2/$hash_name.enc >> /dev/null 2>&1)
 
 rc=$?
+
+echo "$rc"
+
 if [ $rc -eq 0 ]
 then
     echo "File $2/$hash_name already exists"
@@ -42,4 +45,13 @@ bash encrypt.sh $hash_name.temporary.tar.gz $pass $2/$hash_name.tar.gz
 rm -f $hash_name.temporary.tar.gz
 
 # register encrypted file in db
-curl --data "{\"id\": \"$hash_name\", \"name\": \"$1\", \"password\": \"$pass\", \"path\": \"$PWD$1\"}" localhost:3000/encrypted
+curl -f --data "{\"id\": \"$hash_name\", \"name\": \"$1\", \"password\": \"$pass\", \"path\": \"$PWD/$1\"}" localhost:3000/encrypted
+
+rc=$?
+
+echo "$rc"
+
+if [ $rc -ne 0 ]
+then
+    echo "Curl failed!"
+fi
