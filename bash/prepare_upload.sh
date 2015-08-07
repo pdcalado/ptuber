@@ -2,13 +2,19 @@
 
 if [ "$2" == "" ]
 then
-    echo "Missing argument"
+    echo "Missing argument folder"
+    exit 1
+fi
+
+if [ "$3" == "" ]
+then
+    echo "Missing argument password"
     exit 1
 fi
 
 hash_name=$(echo -n "$1" | md5sum - | cut -d' ' -f1)
 
-pass=$(bash gen_passwd.sh)
+pass=$3
 
 # Check if encrypted file already exists
 nulled=$(stat $2/$hash_name.enc >> /dev/null 2>&1)
@@ -50,4 +56,5 @@ rc=$?
 if [ $rc -ne 0 ]
 then
     echo "Curl failed!"
+    exit 1
 fi

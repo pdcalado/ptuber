@@ -53,6 +53,14 @@ then
     skicka upload crypted/$hash_name.tar.gz Brno/
 fi
 
+rc=$?
+
+if [ $rc -ne 0 ]
+then
+    echo "Upload failed!"
+    exit 1
+fi
+
 # register uploaded file in db
 curl -f --data "{\"id\": \"$hash_name\", \"path\": \"$2\", \"password\": \"$3\", \"thumbs\": \"$thumbs\"}" localhost:3000/uploaded
 
@@ -61,4 +69,5 @@ rc=$?
 if [ $rc -ne 0 ]
 then
     echo "Curl failed!"
+    exit 1
 fi
