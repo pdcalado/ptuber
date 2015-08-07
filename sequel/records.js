@@ -104,7 +104,7 @@ Records.prototype.setUploaded = function (row, callback) {
     }
 
     var values = "'" + row.id + "', '" + row.path + "', '" + row.password + "'";
-    if (row.path !== undefined) {
+    if (row.thumbs !== undefined) {
 	values += ", '" + row.thumbs + "'";
     } else {
 	values += ", ''";
