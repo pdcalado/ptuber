@@ -15,8 +15,6 @@ nulled=$(stat $2/$hash_name.enc >> /dev/null 2>&1)
 
 rc=$?
 
-echo "$rc"
-
 if [ $rc -eq 0 ]
 then
     echo "File $2/$hash_name already exists"
@@ -48,8 +46,6 @@ rm -f $hash_name.temporary.tar.gz
 curl -f --data "{\"id\": \"$hash_name\", \"name\": \"$1\", \"password\": \"$pass\", \"path\": \"$PWD/$1\"}" localhost:3000/encrypted
 
 rc=$?
-
-echo "$rc"
 
 if [ $rc -ne 0 ]
 then
