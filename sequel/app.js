@@ -37,14 +37,14 @@ function onGetEncrypted(req, res) {
     var queryData = url.parse(req.url, true).query;
 
     if (queryData.name === undefined && queryData.id === undefined) {
-	res.statusCode = 404;
+	res.writeHead(404);
 	res.end("Bad query, no name or id");
 	return;
     }
 
     function handleResult(err, obj) {
 	if (err !== null) {
-	    res.statusCode = 404;
+	    res.writeHead(404);
 	    res.end();
 	    return;
 	}
@@ -63,7 +63,7 @@ function onGetEncrypted(req, res) {
 	return;
     }
 
-    res.statusCode = 404;
+    res.writeHead(404);
     res.end("Undefined state");
 }
 
@@ -75,22 +75,22 @@ function onPostEncrypted(req, res) {
     });
 
     req.on('end', function() {
-	res.writeHead(200, {'Content-Type': 'text/plain'});
+
 	var obj = JSON.parse(data);
 	recs.setEncrypted(obj, function (err) {
 	    if (err !== null) {
-		res.statusCode = 404;
+		res.writeHead(404, {'Content-Type': 'text/plain'});
 		res.end("failed post: " + err);
 		return;
 	    }
 
-	    res.statusCode = 200;
+	    res.writeHead(200, {'Content-Type': 'text/plain'});
 	    res.end("Success");
 	});
     });
 
     req.on('error', function(e) {
-	res.statusCode = 404;
+	res.writeHead(404);
 	res.end(e);
 	return;
     });
