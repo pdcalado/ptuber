@@ -67,6 +67,35 @@ function onGetEncrypted(req, res) {
     res.end("Undefined state");
 }
 
+function onPostUploaded(req, res) {
+    var data = "";
+
+    req.on('data', function(chunk) {
+	data += chunk.toString();
+    });
+
+    req.on('end', function() {
+
+	var obj = JSON.parse(data);
+	recs.setUploaded(obj, function (err) {
+	    if (err !== null) {
+		res.writeHead(404, {'Content-Type': 'text/plain'});
+		res.end("failed post: " + err);
+		return;
+	    }
+
+	    res.writeHead(200, {'Content-Type': 'text/plain'});
+	    res.end("Success");
+	});
+    });
+
+    req.on('error', function(e) {
+	res.writeHead(404);
+	res.end(e);
+	return;
+    });
+}
+
 function onPostEncrypted(req, res) {
     var data = "";
 
@@ -105,6 +134,18 @@ var server = http.createServer(function (request, response) {
 	    } else if (request.method === "POST") {
 		onPostEncrypted(request, response);
 	    }
+
+	    return;
+	}
+
+	if (request.url.indexOf("/uploaded") === 0) {
+	    if (request.method === "GET") {
+		onGetUploaded(request, response);
+	    } else if (request.method === "POST") {
+		onPostUploaded(request, response);
+	    }
+
+	    return;
 	}
     }
     catch (err) {
