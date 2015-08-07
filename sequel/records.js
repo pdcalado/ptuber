@@ -11,8 +11,7 @@ Records.prototype.close = function () {
 
 var colNames = "id, name, password, path";
 
-// Get rows from encrypted table
-Records.prototype.getEncrypted = function (field, value, callback) {
+Records.prototype.getRow = function(table, field, value, callback) {
     var sqlerr = null;
     var obj = {};
 
@@ -29,7 +28,7 @@ Records.prototype.getEncrypted = function (field, value, callback) {
 	obj.path = row.path;
     }
 
-    var q = "SELECT " + colNames + " FROM encrypted WHERE " + field + " = '" + value + "'";
+    var q = "SELECT " + colNames + " FROM " + table + " WHERE " + field + " = '" + value + "'";
     console.log(q);
 
     var dbref = this.db;
@@ -48,6 +47,11 @@ Records.prototype.getEncrypted = function (field, value, callback) {
 		       return;
 		   });
     });
+}
+
+// Get rows from encrypted table
+Records.prototype.getEncrypted = function (field, value, callback) {
+    this.getRow("encrypted", field, value, callback);
 };
 
 // Insert a row into encrypted table
@@ -69,6 +73,44 @@ Records.prototype.setEncrypted = function (row, callback) {
     }
 
     var q = "INSERT INTO encrypted VALUES (" + values + ")";
+
+    console.log(q);
+
+    this.db.run(q, [], function (err) {
+	if (err !== null) {
+	    console.log("Insertion error: " + err);
+	    callback(err);
+	    return;
+	}
+
+	callback(null);
+    });
+};
+
+// Get rows from encrypted table
+Records.prototype.getUploaded = function (field, value, callback) {
+    this.getRow("uploaded", field, value, callback);
+};
+
+Records.prototype.setUploaded = function (row, callback) {
+    var sqlerr = null;
+
+    if (row.id === undefined ||
+	row.path === undefined ||
+	row.password === undefined ||
+	row.thumbs === undefined) {
+	callback("at least id, path and password must be provided");
+	return;
+    }
+
+    var values = "'" + row.id + "', '" + row.path + "', '" + row.password + "'";
+    if (row.path !== undefined) {
+	values += ", '" + row.thumbs + "'";
+    } else {
+	values += ", ''";
+    }
+
+    var q = "INSERT INTO uploaded VALUES (" + values + ")";
 
     console.log(q);
 
