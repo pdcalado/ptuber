@@ -43,7 +43,7 @@ function onGetEncrypted(req, res) {
     }
 
     function handleResult(err, obj) {
-	if (err !== null) {
+	if (err !== null || obj.id === undefined) {
 	    res.writeHead(404);
 	    res.end();
 	    return;
@@ -65,6 +65,29 @@ function onGetEncrypted(req, res) {
 
     res.writeHead(404);
     res.end("Undefined state");
+}
+
+function onGetUploaded(req, res) {
+    var queryData = url.parse(req.url, true).query;
+
+    if (queryData.id === undefined) {
+	res.writeHead(404);
+	res.end("Bad query, no id");
+	return;
+    }
+
+    function handleResult(err, obj) {
+	if (err !== null || obj.id === undefined) {
+	    res.writeHead(404);
+	    res.end();
+	    return;
+	}
+
+	res.writeHead(200, {'Content-Type': 'text/json'});
+	res.end(JSON.stringify(obj));
+    }
+
+    recs.getUploaded("id", queryData.id, handleResult);
 }
 
 function onPostUploaded(req, res) {
