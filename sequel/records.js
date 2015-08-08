@@ -9,13 +9,38 @@ Records.prototype.close = function () {
     this.db.close();
 };
 
-var colNames = "id, name, password, path";
+var colNames = {};
+colNames["encrypted"] = "id, name, password, path";
+colNames["uploaded"] = "id, path, password, thumbs";
 
-Records.prototype.getRow = function(table, field, value, callback) {
-    var sqlerr = null;
+Records.prototype.getRow = function(table, field, value, rowParse, callback) {
+    var q = "SELECT " + colNames[table] + " FROM " + table + " WHERE " + field + " = '" + value + "'";
+    console.log(q);
+
+    var dbref = this.db;
+
+    dbref.serialize(function() {
+	dbref.each(q,
+		   rowParse,
+		   function(err) {
+		       if (err !== null) {
+			   console.log("Completion error: " + err);
+			   callback(err);
+			   return;
+		       }
+
+		       callback(null);
+		       return;
+		   });
+    });
+}
+
+// Get rows from encrypted table
+Records.prototype.getEncrypted = function (field, value, callback) {
     var obj = {};
+    var sqlerr = null;
 
-    function rowParse(err, row) {
+    function parseEnc(err, row) {
 	if (err !== null) {
 	    sqlerr = err;
 	    console.log(err);
@@ -28,30 +53,16 @@ Records.prototype.getRow = function(table, field, value, callback) {
 	obj.path = row.path;
     }
 
-    var q = "SELECT " + colNames + " FROM " + table + " WHERE " + field + " = '" + value + "'";
-    console.log(q);
+    function result(err) {
+	if (err !== null) {
+	    callback(err, null);
+	    return;
+	}
 
-    var dbref = this.db;
+	callback(null, obj);
+    }
 
-    dbref.serialize(function() {
-	dbref.each(q,
-		   rowParse,
-		   function(err) {
-		       if (err !== null || sqlerr !== null) {
-			   console.log("Completion error: " + err + " " + sqlerr);
-			   callback(err + " " + sqlerr, null);
-			   return;
-		       }
-
-		       callback(null, obj);
-		       return;
-		   });
-    });
-}
-
-// Get rows from encrypted table
-Records.prototype.getEncrypted = function (field, value, callback) {
-    this.getRow("encrypted", field, value, callback);
+    this.getRow("encrypted", field, value, parseEnc, result);
 };
 
 // Insert a row into encrypted table
@@ -89,7 +100,32 @@ Records.prototype.setEncrypted = function (row, callback) {
 
 // Get rows from encrypted table
 Records.prototype.getUploaded = function (field, value, callback) {
-    this.getRow("uploaded", field, value, callback);
+    var obj = {};
+    var sqlerr = null;
+
+    function parseUp(err, row) {
+	if (err !== null) {
+	    sqlerr = err;
+	    console.log(err);
+	    return;
+	}
+
+	obj.id = row.id;
+	obj.path = row.path;
+	obj.password = row.password;
+	obj.thumbs = row.thumbs;
+    }
+
+    function result(err) {
+	if (err !== null) {
+	    callback(err, null);
+	    return;
+	}
+
+	callback(null, obj);
+    }
+
+    this.getRow("uploaded", field, value, parseUp, result);
 };
 
 Records.prototype.setUploaded = function (row, callback) {
