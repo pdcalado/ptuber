@@ -18,21 +18,21 @@ then
     exit 1
 fi
 
-hash_name=$(echo -n "$1" | md5sum - | cut -d' ' -f1)
+hash_name=$(bash hash_name.sh $1)
 
 # Check if encrypted file already exists
-nulled=$(stat crypted/$hash_name.enc >> /dev/null 2>&1)
+nulled=$(stat $CRYPTED_FOLDER/$hash_name.enc >> /dev/null 2>&1)
 
 rc=$?
 
 if [ $rc -ne 0 ]
 then
-    echo "File crypted/$hash_name.enc not found"
+    echo "File $CRYPTED_FOLDER/$hash_name.enc not found"
     exit 1
 fi
 
 # Check if thumbs already exist
-nulled=$(stat crypted/$hash_name.tar.gz >> /dev/null 2>&1)
+nulled=$(stat $CRYPTED_FOLDER/$hash_name.tar.gz >> /dev/null 2>&1)
 
 rc=$?
 
@@ -46,11 +46,11 @@ else
 fi
 
 # Upload file using skicka
-skicka upload crypted/$hash_name.enc Brno/
+skicka upload $CRYPTED_FOLDER/$hash_name.enc Brno/
 
 if [ -n $thumbs ]
 then
-    skicka upload crypted/$hash_name.tar.gz Brno/
+    skicka upload $CRYPTED_FOLDER/$hash_name.tar.gz Brno/
 fi
 
 rc=$?
@@ -62,7 +62,7 @@ then
 fi
 
 # register uploaded file in db
-curl -f --data "{\"id\": \"$hash_name\", \"path\": \"$2\", \"password\": \"$3\", \"thumbs\": \"$thumbs\"}" localhost:3000/uploaded
+curl -f --data "{\"id\": \"$hash_name\", \"path\": \"$2\", \"password\": \"$3\", \"thumbs\": \"$thumbs\"}" $DB_URL/uploaded
 
 rc=$?
 

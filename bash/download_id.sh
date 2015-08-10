@@ -8,7 +8,7 @@ then
     echo "Preview mode!"
 fi
 
-uprow=$(curl -f localhost:3000/uploaded?id="$1")
+uprow=$(curl -f $DB_URL/uploaded?id="$1")
 
 rc=$?
 
@@ -18,7 +18,7 @@ then
     exit 1
 fi
 
-encrow=$(curl -f localhost:3000/encrypted?id="$1")
+encrow=$(curl -f $DB_URL/encrypted?id="$1")
 
 rc=$?
 
@@ -34,15 +34,15 @@ password=$(echo $uprow | jq '.password' | sed -e 's/^"//'  -e 's/"$//')
 
 if [ $preview -ne 1 ]
 then
-    skicka download $filepath$1.enc crypted/
-    bash decrypt.sh crypted/$1.enc $password decrypted/$filename
+    skicka download $filepath$1.enc $CRYPTED_FOLDER/
+    bash decrypt.sh $CRYPTED_FOLDER/$1.enc $password $DECRYPTED_FOLDER/$filename
 fi
 
-skicka download $filepath$1.tar.gz crypted/
-bash decrypt.sh crypted/$1.tar.gz $password temporary.tar.gz
+skicka download $filepath$1.tar.gz $CRYPTED_FOLDER/
+bash decrypt.sh $CRYPTED_FOLDER/$1.tar.gz $password temporary.tar.gz
 tar -zxf temporary.tar.gz
 
 if [ $preview -eq 1 ]
 then
-    gpicview thumbs/$1-*
+    gpicview $THUMBS_FOLDER/$1-*
 fi

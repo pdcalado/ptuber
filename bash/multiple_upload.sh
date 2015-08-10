@@ -3,7 +3,7 @@
 for item in $*; do
     echo "-- Processing $item --"
     pass=$(bash gen_passwd.sh)
-    bash prepare_upload.sh $item crypted $pass
+    bash prepare_upload.sh $item $pass
 
     rc=$?
 
