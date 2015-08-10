@@ -33,15 +33,7 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-function onGetEncrypted(req, res) {
-    var queryData = url.parse(req.url, true).query;
-
-    if (queryData.name === undefined && queryData.id === undefined) {
-	res.writeHead(404);
-	res.end("Bad query, no name or id");
-	return;
-    }
-
+function onGet(req, res, key, value, method) {
     function handleResult(err, obj) {
 	if (err !== null || obj.id === undefined) {
 	    res.writeHead(404);
@@ -53,13 +45,25 @@ function onGetEncrypted(req, res) {
 	res.end(JSON.stringify(obj));
     }
 
+    recs[method](key, value, handleResult);
+}
+
+function onGetEncrypted(req, res) {
+    var queryData = url.parse(req.url, true).query;
+
+    if (queryData.name === undefined && queryData.id === undefined) {
+	res.writeHead(404);
+	res.end("Bad query, no name or id");
+	return;
+    }
+
     if (queryData.name === undefined) {
-	recs.getEncrypted("id", queryData.id, handleResult);
+	onGet(req, res, "id", queryData.id, "getEncrypted");
 	return;
     }
 
     if (queryData.id === undefined) {
-	recs.getEncrypted("name", queryData.name, handleResult);
+	onGet(req, res, "name", queryData.name, "getEncrypted");
 	return;
     }
 
@@ -76,18 +80,7 @@ function onGetUploaded(req, res) {
 	return;
     }
 
-    function handleResult(err, obj) {
-	if (err !== null || obj.id === undefined) {
-	    res.writeHead(404);
-	    res.end();
-	    return;
-	}
-
-	res.writeHead(200, {'Content-Type': 'text/json'});
-	res.end(JSON.stringify(obj));
-    }
-
-    recs.getUploaded("id", queryData.id, handleResult);
+    onGet(req, res, "id", queryData.id, "getUploaded");
 }
 
 function onPostUploaded(req, res) {
@@ -150,7 +143,7 @@ function onPostEncrypted(req, res) {
 
 //Create the server
 var server = http.createServer(function (request, response) {
-    try {
+    // try {
 	if (request.url.indexOf("/encrypted") === 0) {
 	    if (request.method === "GET") {
 		onGetEncrypted(request, response);
@@ -170,10 +163,10 @@ var server = http.createServer(function (request, response) {
 
 	    return;
 	}
-    }
-    catch (err) {
-	console.log("error: " + err);
-    }
+    // }
+    // catch (err) {
+    // 	console.log("error: " + err);
+    // }
 });
 
 server.listen(PORT, function () {
