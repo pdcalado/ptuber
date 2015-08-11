@@ -2,7 +2,7 @@
 
 for item in $*
 do
-    curl -f localhost:3000/encrypted?name="$item" > /dev/null 2>&1
+    curl -f $DB_URL/encrypted?name="$item" > /dev/null 2>&1
     rc=$?
 
     if [ $rc -eq 0 ]
@@ -12,9 +12,9 @@ do
 	echo "UNABLE TO FIND $item in encrypted."
     fi
 
-    hash_name=$(echo -n "$item" | md5sum - | cut -d' ' -f1)
+    hash_name=$(bash hash_name.sh $item)
 
-    curl -f localhost:3000/uploaded?id="$hash_name" > /dev/null 2>&1
+    curl -f $DB_URL/uploaded?id="$hash_name" > /dev/null 2>&1
     rc=$?
 
     if [ $rc -eq 0 ]
