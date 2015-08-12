@@ -10,8 +10,8 @@ Records.prototype.close = function () {
 };
 
 var colNames = {};
-colNames["encrypted"] = "id, name, password, path";
-colNames["uploaded"] = "id, path, password, thumbs";
+colNames.encrypted = "id, name, password, path";
+colNames.uploaded = "id, path, password, thumbs";
 
 Records.prototype.getRow = function(table, field, value, rowParse, callback) {
     var q = "SELECT " + colNames[table] + " FROM " + table + " WHERE " + field + " = '" + value + "'";
@@ -33,7 +33,7 @@ Records.prototype.getRow = function(table, field, value, rowParse, callback) {
 		       return;
 		   });
     });
-}
+};
 
 // Get rows from encrypted table
 Records.prototype.getEncrypted = function (field, value, callback) {
