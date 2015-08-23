@@ -13,15 +13,14 @@ var colNames = {};
 colNames.encrypted = "id, name, password, path";
 colNames.uploaded = "id, path, password, thumbs";
 
-Records.prototype.getRow = function(table, field, value, rowParse, callback) {
-    var q = "SELECT " + colNames[table] + " FROM " + table + " WHERE " + field + " = '" + value + "'";
-    console.log(q);
+Records.prototype.serialize = function(query, parse, callback) {
+    console.log(query);
 
     var dbref = this.db;
 
     dbref.serialize(function() {
-	dbref.each(q,
-		   rowParse,
+	dbref.each(query,
+		   parse,
 		   function(err) {
 		       if (err !== null) {
 			   console.log("Completion error: " + err);
@@ -34,6 +33,43 @@ Records.prototype.getRow = function(table, field, value, rowParse, callback) {
 		   });
     });
 };
+
+Records.prototype.getRow = function(table, field, value, rowParse, callback) {
+    var q = "SELECT " + colNames[table] + " FROM " + table + " WHERE " + field + " = '" + value + "'";
+
+    this.serialize(q, rowParse, callback);
+};
+
+Records.prototype.getAll = function(table, rowParse, callback) {
+    var q = "SELECT * FROM " + table;
+    this.serialize(q, rowParse, callback);
+};
+
+Records.prototype.getList = function(callback) {
+    var list = [];
+    var sqlerr = null;
+
+    function parseEnc(err, row) {
+	if (err !== null) {
+	    sqlerr = err;
+	    console.log(err);
+	    return;
+	}
+
+	list.push({id: row.id, name: row.name, password: row.password});
+    }
+
+    function result(err) {
+	if (err !== null) {
+	    callback(err, null);
+	    return;
+	}
+
+	callback(null, list);
+    }
+
+    this.getAll("encrypted", parseEnc, result);
+}
 
 // Get rows from encrypted table
 Records.prototype.getEncrypted = function (field, value, callback) {

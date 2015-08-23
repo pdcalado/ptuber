@@ -83,6 +83,21 @@ function onGetUploaded(req, res) {
     onGet(req, res, "id", queryData.id, "getUploaded");
 }
 
+function onGetList(req, res) {
+    function handleResult(err, list) {
+	if (err !== null || list.length === 0) {
+	    res.writeHead(404);
+	    res.end();
+	    return;
+	}
+
+	res.writeHead(200, {'Content-Type': 'text/json'});
+	res.end(JSON.stringify(list));
+    }
+
+    recs.getList(handleResult);   
+}
+
 function onPostUploaded(req, res) {
     var data = "";
 
@@ -144,25 +159,33 @@ function onPostEncrypted(req, res) {
 //Create the server
 var server = http.createServer(function (request, response) {
     // try {
-	if (request.url.indexOf("/encrypted") === 0) {
-	    if (request.method === "GET") {
-		onGetEncrypted(request, response);
-	    } else if (request.method === "POST") {
-		onPostEncrypted(request, response);
-	    }
-
-	    return;
+    if (request.url.indexOf("/encrypted") === 0) {
+	if (request.method === "GET") {
+	    onGetEncrypted(request, response);
+	} else if (request.method === "POST") {
+	    onPostEncrypted(request, response);
 	}
 
-	if (request.url.indexOf("/uploaded") === 0) {
-	    if (request.method === "GET") {
-		onGetUploaded(request, response);
-	    } else if (request.method === "POST") {
-		onPostUploaded(request, response);
-	    }
+	return;
+    }
 
-	    return;
+    if (request.url.indexOf("/uploaded") === 0) {
+	if (request.method === "GET") {
+	    onGetUploaded(request, response);
+	} else if (request.method === "POST") {
+	    onPostUploaded(request, response);
 	}
+
+	return;
+    }
+
+    if (request.url.indexOf("/list") === 0) {
+	if (request.method === "GET") {
+	    onGetList(request, response);
+	}
+
+	return;
+    }
     // }
     // catch (err) {
     // 	console.log("error: " + err);

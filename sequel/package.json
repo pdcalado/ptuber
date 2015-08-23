@@ -11,8 +11,6 @@
   "dependencies": {
     "browser-sync": "^2.8.2",
     "browserify": "^11.0.1",
-    "gulp": "^3.9.0",
-    "gulp-util": "^3.0.6",
     "http": "0.0.0",
     "jshint-stylish": "^2.0.1",
     "jstify": "^0.12.0",
