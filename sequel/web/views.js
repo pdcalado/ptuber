@@ -18,10 +18,22 @@ BlobListItem = Backbone.View.extend({
 	// Clear existing row data if needed
 	jQuery(this.el).empty();
 
+	// Columns
+	var cols = ['id', 'name', 'password', 'path',
+		    'upath', 'upassword', 'thumbs'];
+
+	var m = this.model;
+	var element = this.el;
+
 	// Write the table columns
-	jQuery(this.el).append(jQuery('<td>' + this.model.get('id') + '</td>'));
-	jQuery(this.el).append(jQuery('<td>' + this.model.get('name') + '</td>'));
-	jQuery(this.el).append(jQuery('<td>' + this.model.get('password') + '</td>'));
+	cols.forEach(function (cname) {
+	    if (cname === 'id' && m.get(cname) === 'af592ab7a2e6544d10db7d7eac3398cd') {
+		console.log("pass is: " + m.get('password'));
+	    }
+
+	    var v = jQuery('<td>' + m.get(cname) + '</td>');
+	    jQuery(element).append(v);
+	});
 
 	return this;
     }
@@ -40,9 +52,19 @@ BlobList = Backbone.View.extend({
 	// Ensure our methods keep the `this` reference to the view itself
 	_.bindAll(this, 'render');
 
-	// Bind collection changes to re-rendering
+	//Bind collection changes to re-rendering
 	this.collection.bind('reset', this.render);
 	this.collection.bind('add', this.render);
+	// this.collection.bind('add', function(item) {
+	//     var itemView = new BlobListItem({
+	// 	model: item
+	//     });
+
+	//     var element = jQuery(this.el);
+	//     element.append(itemView.render().el);
+
+	//     return this;
+	// });
 	this.collection.bind('remove', this.render);
     },
 
@@ -51,11 +73,8 @@ BlobList = Backbone.View.extend({
 	// Clear potential old entries first
 	element.empty();
 
-	console.log(this.collection);
-
 	// Go through the collection items
 	this.collection.each(function(item) {
-
 	    // Instantiate a PeopleItem view for each
 	    var itemView = new BlobListItem({
 		model: item
