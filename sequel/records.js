@@ -96,7 +96,7 @@ Records.prototype.getList = function(callback) {
     }
 
     rec.getAll("encrypted", parseEnc, result);
-}
+};
 
 // Get rows from encrypted table
 Records.prototype.getEncrypted = function (field, value, callback) {
