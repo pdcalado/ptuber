@@ -5,14 +5,18 @@ Blob = Backbone.Model.extend({
     defaults: {
         id: "",
         name: "",
-	password: ""
+	password: "",
+	path: "",
+	upath: "",
+	upassword: "",
+	thumbs: ""
     }
 });
 
 // Blob collection
 BlobList = Backbone.Collection.extend({
     model: Blob,
-    url: "/init.json"
+    url: "http://localhost:3000/list"
 });
 
 exports.Blob = Blob;
