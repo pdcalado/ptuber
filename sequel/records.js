@@ -49,6 +49,8 @@ Records.prototype.getList = function(callback) {
     var list = [];
     var sqlerr = null;
 
+    var rec = this;
+
     function parseEnc(err, row) {
 	if (err !== null) {
 	    sqlerr = err;
@@ -65,10 +67,35 @@ Records.prototype.getList = function(callback) {
 	    return;
 	}
 
-	callback(null, list);
+	function parseUp(err, row) {
+	    if (err !== null) {
+		sqlerr = err;
+		console.log(err);
+		return;
+	    }
+
+	    list.forEach(function(item) {
+		if (item.id === row.id) {
+		    item.upath = row.path;
+		    item.upassword = row.password;
+		    item.thumbs = row.thumbs;
+		}
+	    });
+	}
+
+	function complete(err) {
+	    if (err !== null) {
+		callback(err, null);
+		return;
+	    }
+
+	    callback(null, list);
+	}
+
+	rec.getAll("uploaded", parseUp, complete);
     }
 
-    this.getAll("encrypted", parseEnc, result);
+    rec.getAll("encrypted", parseEnc, result);
 }
 
 // Get rows from encrypted table
