@@ -1,0 +1,30 @@
+{
+  "name": "ptuber",
+  "version": "1.0.0",
+  "description": "web interface for ptuber",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "backbone": "^1.2.2",
+    "backgrid": "^0.3.5",
+    "browser-sync": "^2.8.2",
+    "browserify": "^11.0.1",
+    "jquery": "^2.1.4",
+    "jstify": "^0.12.0",
+    "page": "^1.6.3",
+    "path": "^0.11.14",
+    "request": "^2.61.0",
+    "underscore": "^1.8.3",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.3.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-util": "^3.0.6"
+  }
+}
