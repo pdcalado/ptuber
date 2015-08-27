@@ -1,7 +1,7 @@
 var Backbone = require('backbone');
 var jQuery = require('jquery');
 var models = require('./models.js');
-var views = require('./views.js');
+var views = require('./contactview.js');
 
 var Router = Backbone.Router.extend({
     routes: {
@@ -30,7 +30,8 @@ var Router = Backbone.Router.extend({
 	list.fetch();
 
 	// Pass the collection of people to the view
-	var view = new views.BlobList({
+	// var view = new views.BlobList({
+	var view = new views.ContactList({
 	    collection: list
 	});
 
