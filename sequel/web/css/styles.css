@@ -9,10 +9,10 @@ th {
     color: white;
 }
 
-.contact-container { width:400px; padding:10px; border:1px solid #aaa; margin:0 10px 10px 0; float:left; font-family:sans-serif; color:#333; background-color:#eee; }
+.contact-container { width:400px; height:240px; padding:10px; border:1px solid #aaa; margin:0 10px 10px 0; float:left; font-family:sans-serif; color:#333; background-color:#eee; }
 .contact-container h1 { margin:0; font-size:14px; font-weight:normal; }
 .contact-container h1 span { float:left; font-size:10px; font-weight:normal; }
-.contact-container img { border-width:1px; border-style:solid; border-color:#fff; border-right-color:#aaa; border-bottom-color:#aaa; margin-right:10px; float:left; }
+.contact-container img { width:350px; height:200px; border-width:1px; border-style:solid; border-color:#fff; border-right-color:#aaa; border-bottom-color:#aaa; margin-right:10px; float:left; }
 .contact-container div { margin-bottom:24px; font-size:14px; }
 .contact-container a { color:#333;}
 .contact-container dl { margin:0; float:down; font-size:10px; }
