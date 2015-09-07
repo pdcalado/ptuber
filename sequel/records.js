@@ -1,4 +1,5 @@
 var sqlite3 = require('sqlite3').verbose();
+var thumbs = require('./thumbs.js');
 
 Records = function Records(dbfile) {
     this.db = new sqlite3.Database(dbfile);
@@ -79,6 +80,11 @@ Records.prototype.getList = function(callback) {
 		    item.upath = row.path;
 		    item.upassword = row.password;
 		    item.thumbs = row.thumbs;
+
+		    preview = thumbs.getPreview(item.id);
+		    if (preview !== null) {
+			item.preview = preview;
+		    }
 		}
 	    });
 	}
