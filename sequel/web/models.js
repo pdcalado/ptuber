@@ -9,7 +9,8 @@ Blob = Backbone.Model.extend({
 	path: "",
 	upath: "",
 	upassword: "",
-	thumbs: ""
+	thumbs: "",
+	preview: "./img/placeholder.png"
     }
 });
 
