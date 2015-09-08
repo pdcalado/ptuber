@@ -79,12 +79,7 @@ Records.prototype.getList = function(callback) {
 		if (item.id === row.id) {
 		    item.upath = row.path;
 		    item.upassword = row.password;
-		    item.thumbs = row.thumbs;
-
-		    preview = thumbs.getPreview(item.id);
-		    if (preview !== null) {
-			item.preview = preview;
-		    }
+		    item.thumbs = thumbs.getThumbs(item.id);
 		}
 	    });
 	}
