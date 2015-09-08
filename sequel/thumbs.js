@@ -4,18 +4,21 @@ process = require('process');
 search_path = "../../thumbs/";
 result_path = "./img/thumbs/";
 
-exports.getPreview = function(id) {
-    files = fs.readdirSync(search_path);
-    preview = null;
+exports.getThumbs = function(id) {
+    var thumbs = [];
+
+    var files = fs.readdirSync(search_path);
 
     files.forEach(function(item) {
-	res = item.match(id+"-50.*");
+	res = item.match(id+"-*");
 	if (res !== null) {
-	    preview = result_path + res.input;
-	    return;
+	    thumbs.push(res.input);
 	}
     });
 
-    return preview;
+    if (thumbs.length > 0) {
+	return thumbs.join();
+    } else {
+	return "";
+    }
 };
-
