@@ -2,6 +2,8 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var jQuery = require('jquery');
 
+var thumb_path = "./img/thumbs/";
+
 Backbone.$ = jQuery;
 
 ContactItem = Backbone.View.extend({
@@ -21,7 +23,15 @@ ContactItem = Backbone.View.extend({
 	// Clear existing row data if needed
 	this.$el.empty();
 
-        this.$el.html(this.template(this.model.toJSON()));
+	var obj = this.model.toJSON();
+	var thumb_list = obj.thumbs.split(",");
+
+	if (thumb_list.length > 0) {
+	    var idx = Math.floor(thumb_list.length / 2);
+	    obj.preview = thumb_path + thumb_list[idx];
+	}
+
+        this.$el.html(this.template(obj));
 
         return this;
     }
