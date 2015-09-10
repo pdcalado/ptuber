@@ -20,7 +20,7 @@ BlobListItem = Backbone.View.extend({
 
 	// Columns
 	var cols = ['id', 'name', 'password', 'path',
-		    'upath', 'upassword', 'thumbs'];
+		    'upath', 'upassword'];
 
 	var m = this.model;
 	var element = this.el;
@@ -70,8 +70,6 @@ BlobList = Backbone.View.extend({
 	var element = jQuery(this.el);
 	// Clear potential old entries first
 	element.empty();
-
-	console.log(this.collection);
 
 	// Go through the collection items
 	this.collection.each(this.singleRender);
