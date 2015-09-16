@@ -1,7 +1,7 @@
 /* jshint node: true */
 'use strict';
 
-var Backbone = require('backbone');
+// var Backbone = require('backbone');
 
 // window.$ = window.jQuery = Backbone.$ = jquery;
 
